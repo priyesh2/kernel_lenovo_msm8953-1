@@ -99,3 +99,6 @@ all.config
 
 # fetched Android config fragments
 android/configs/android-*.cfg
+drivers/gpu/drm/nouveau/core/subdev/i2c/aux.c
+drivers/gpu/drm/nouveau/nvkm/subdev/i2c/aux.c
+drivers/gpu/drm/nouveau/core/subdev/i2c/aux.c
