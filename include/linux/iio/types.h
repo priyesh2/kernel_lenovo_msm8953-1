@@ -35,6 +35,8 @@ enum iio_chan_type {
 	IIO_STEP_DETECTOR,
 	IIO_STEP_COUNTER,
 	IIO_TILT,
+	IIO_TAP,
+	IIO_TAP_TAP,
 };
 
 enum iio_modifier {

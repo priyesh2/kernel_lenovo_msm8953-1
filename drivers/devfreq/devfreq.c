@@ -195,10 +195,15 @@ int update_devfreq(struct devfreq *devfreq)
 	if (!devfreq->governor)
 		return -EINVAL;
 
-	/* Reevaluate the proper frequency */
-	err = devfreq->governor->get_target_freq(devfreq, &freq, &flags);
-	if (err)
-		return err;
+	if (devfreq->max_boost) {
+		/* Use the max freq for max boosts */
+		freq = ULONG_MAX;
+	} else {
+		/* Reevaluate the proper frequency */
+		err = devfreq->governor->get_target_freq(devfreq, &freq, &flags);
+		if (err)
+			return err;
+	}
 
 	/*
 	 * Adjust the freuqency with user freq and QoS.
@@ -815,6 +820,15 @@ static ssize_t governor_store(struct device *dev, struct device_attribute *attr,
 	if (ret != 1)
 		return -EINVAL;
 
+	/* Governor white list */
+	if (strncmp(str_governor, "bw_hwmon", DEVFREQ_NAME_LEN) &&
+		strncmp(str_governor, "cpufreq", DEVFREQ_NAME_LEN) &&
+		strncmp(str_governor, "performance", DEVFREQ_NAME_LEN) &&
+		strncmp(str_governor, "powersave", DEVFREQ_NAME_LEN) &&
+		strncmp(str_governor, "mem_latency", DEVFREQ_NAME_LEN) &&
+		strncmp(str_governor, "msm-adreno-tz", DEVFREQ_NAME_LEN))
+		return -EINVAL;
+
 	mutex_lock(&devfreq_list_lock);
 	governor = find_devfreq_governor(str_governor);
 	if (IS_ERR(governor)) {
@@ -926,6 +940,10 @@ static ssize_t min_freq_store(struct device *dev, struct device_attribute *attr,
 	unsigned long value;
 	int ret;
 	unsigned long max;
+
+	/* Minfreq is managed by devfreq_boost */
+	if (df->is_boost_device)
+		return count;
 
 	ret = sscanf(buf, "%lu", &value);
 	if (ret != 1)

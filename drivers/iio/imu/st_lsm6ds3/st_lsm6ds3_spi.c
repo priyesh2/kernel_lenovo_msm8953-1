@@ -176,7 +176,6 @@ static const struct of_device_id lsm6ds3_of_match[] = {
 		.compatible = "st,lsm6ds33",
 		.data = LSM6DS33_DEV_NAME,
 	},
-	{}
 };
 MODULE_DEVICE_TABLE(of, lsm6ds3_of_match);
 #else /* CONFIG_OF */

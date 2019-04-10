@@ -33,6 +33,7 @@ struct aw2015_platform_data {
 	int fall_time_ms;
 	int off_time_ms;
 	int pwm_duty;
+	int mode;
 	struct aw2015_led *led;
 };
 

@@ -36,6 +36,9 @@ nconfig: $(obj)/nconf
 oldconfig: $(obj)/conf
 	$< --$@ $(Kconfig)
 
+defoldconfig: $(obj)/conf
+	$< --defconfig=.config $(Kconfig)
+
 silentoldconfig: $(obj)/conf
 	$(Q)mkdir -p include/config include/generated
 	$< $(silent) --$@ $(Kconfig)
@@ -114,6 +117,13 @@ configfiles=$(wildcard $(srctree)/kernel/configs/$@ $(srctree)/arch/$(SRCARCH)/c
 	$(if $(call configfiles),, $(error No configuration exists for this target on this architecture))
 	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/kconfig/merge_config.sh -m .config $(configfiles)
 	+$(Q)yes "" | $(MAKE) -f $(srctree)/Makefile oldconfig
+
+define mergeconfig
+$(if $(wildcard $(objtree)/.config),, $(error You need an existing .config for this target))
+$(if $(call configfiles,$(1)),, $(error No configuration exists for this target on this architecture))
+$(Q)$(CONFIG_SHELL) $(srctree)/scripts/kconfig/merge_config.sh -m -O $(objtree) $(objtree)/.config $(call configfiles,$(1))
++$(Q)yes "" | $(MAKE) -f $(srctree)/Makefile oldconfig
+endef
 
 PHONY += kvmconfig
 kvmconfig: kvm_guest.config
